@@ -1,12 +1,23 @@
 package com.example.identity_service.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 
 public class UserCreationRequest {
+    @Size(min = 3, message = "Username must be at least 3 characters long")
+    @NotBlank
     private String username;
+
+    @NotBlank
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
+    @NotBlank
     private String firstName;
+    @NotBlank
     private String lastName;
+    @NotBlank
     private LocalDate dob;
 
     public String getUsername() {
