@@ -3,6 +3,8 @@ package com.example.identity_service.service;
 import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.entity.User;
+import com.example.identity_service.exception.AppException;
+import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +19,8 @@ public class UserService {
     public User createRequest(UserCreationRequest request) {
         User user = new User();
 
-        if(userRepository.existsByUsername(request.getUsername())){
-            throw new RuntimeException("Username already exists");
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
 
         user.setUsername(request.getUsername());
@@ -30,16 +32,16 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<User> getUsers(){
+    public List<User> getUsers() {
         return userRepository.findAll();
     }
 
-    public User getUser(String id){
+    public User getUser(String id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public User updateUser(String userId, UserUpdateRequest request){
+    public User updateUser(String userId, UserUpdateRequest request) {
         User user = getUser(userId);
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -49,7 +51,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void deleteUser(String userId){
+    public void deleteUser(String userId) {
         userRepository.deleteById(userId);
     }
 }

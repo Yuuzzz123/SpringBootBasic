@@ -1,10 +1,17 @@
 package com.example.identity_service.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 
 public class UserUpdateRequest {
+    @NotBlank(message = "FIELD_REQUIRED")
+    @Size(min = 8, message = "PASSWORD_INVALID")
     private String password;
+    @NotBlank(message = "FIELD_REQUIRED")
     private String firstName;
+    @NotBlank(message = "FIELD_REQUIRED")
     private String lastName;
     private LocalDate dob;
 

@@ -6,18 +6,17 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public class UserCreationRequest {
-    @Size(min = 3, message = "Username must be at least 3 characters long")
-    @NotBlank
+    @NotBlank(message = "FIELD_REQUIRED")
+    @Size(min = 3, message = "USERNAME_INVALID")
     private String username;
 
-    @NotBlank
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @NotBlank(message = "FIELD_REQUIRED")
+    @Size(min = 8, message = "PASSWORD_INVALID")
     private String password;
-    @NotBlank
+    @NotBlank(message = "FIELD_REQUIRED")
     private String firstName;
-    @NotBlank
+    @NotBlank(message = "FIELD_REQUIRED")
     private String lastName;
-    @NotBlank
     private LocalDate dob;
 
     public String getUsername() {
