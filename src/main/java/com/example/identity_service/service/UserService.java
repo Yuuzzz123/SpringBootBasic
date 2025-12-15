@@ -4,6 +4,7 @@ import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.dto.response.UserResponse;
 import com.example.identity_service.entity.User;
+import com.example.identity_service.enums.Role;
 import com.example.identity_service.exception.AppException;
 import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.mapper.UserMapper;
@@ -11,18 +12,22 @@ import com.example.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
+
     UserRepository userRepository;
+
     UserMapper userMapper;
+
+    PasswordEncoder passwordEncoder;
 
     public UserResponse createRequest(UserCreationRequest request) {
 
@@ -32,8 +37,14 @@ public class UserService {
 
         User user = userMapper.toUser(request);
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        // Encode password
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        // Assign default role
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Role.USER.name());
+
+        user.setRoles(roles);
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
