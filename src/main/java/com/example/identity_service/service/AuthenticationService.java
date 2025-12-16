@@ -83,7 +83,7 @@ public class AuthenticationService {
                 .issuer("springbootbasic")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
+                        Instant.now().plus(30, ChronoUnit.DAYS).toEpochMilli()
                 ))
                 .claim("scope", buildScope(user))
                 .build();
