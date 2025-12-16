@@ -26,9 +26,10 @@ public class UserController {
 
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.createRequest(request));
-        return apiResponse;
+
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.createRequest(request))
+                .build();
     }
 
     @GetMapping
@@ -39,30 +40,41 @@ public class UserController {
         log.info("Username: {}", authentication.getName());
         authentication.getAuthorities().forEach(grantedAuthority -> log.info("GrantedAuthority: {}", grantedAuthority));
 
-        ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.getUsers());
-        return apiResponse;
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getUsers())
+                .build();
     }
 
     @GetMapping("/{userId}")
     ApiResponse<UserResponse> getUser(@PathVariable String userId) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.getUser(userId));
-        return apiResponse;
+
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUser(userId))
+                .build();
     }
 
     @PutMapping("/{userId}")
     ApiResponse<UserResponse> updateUser(@RequestBody @Valid UserUpdateRequest request, @PathVariable String userId) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.updateUser(userId, request));
-        return apiResponse;
+
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateUser(userId, request))
+                .build();
     }
 
     @DeleteMapping("/{userId}")
     ApiResponse<String> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
-        ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setResult("User deleted successfully");
-        return apiResponse;
+
+        return ApiResponse.<String>builder()
+                .result("User deleted successfully")
+                .build();
+    }
+
+    @GetMapping("/myinfo")
+    ApiResponse<UserResponse> getMyInfo() {
+        
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
     }
 }
