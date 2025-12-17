@@ -1,11 +1,13 @@
 package com.example.identity_service.dto.request;
 
+import com.example.identity_service.validator.DobConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -14,7 +16,7 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
     @NotBlank(message = "FIELD_REQUIRED")
-    @Size(min = 8, message = "PASSWORD_INVALID")
+    @Size(min = 4, message = "PASSWORD_INVALID")
     String password;
 
     @NotBlank(message = "FIELD_REQUIRED")
@@ -23,5 +25,8 @@ public class UserUpdateRequest {
     @NotBlank(message = "FIELD_REQUIRED")
     String lastName;
 
+    @DobConstraint(min = 18, message = "INVALID_DOB")
     LocalDate dob;
+
+    List<String> roles;
 }

@@ -1,5 +1,6 @@
 package com.example.identity_service.dto.request;
 
+import com.example.identity_service.validator.DobConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -15,11 +16,11 @@ import java.time.LocalDate;
 public class UserCreationRequest {
 
     @NotBlank(message = "FIELD_REQUIRED")
-    @Size(min = 3, message = "USERNAME_INVALID")
+    @Size(min = 4, message = "USERNAME_INVALID")
     String username;
 
     @NotBlank(message = "FIELD_REQUIRED")
-    @Size(min = 8, message = "PASSWORD_INVALID")
+    @Size(min = 4, message = "PASSWORD_INVALID")
     String password;
 
     @NotBlank(message = "FIELD_REQUIRED")
@@ -28,5 +29,6 @@ public class UserCreationRequest {
     @NotBlank(message = "FIELD_REQUIRED")
     String lastName;
 
+    @DobConstraint(min = 16, message = "INVALID_DOB")
     LocalDate dob;
 }

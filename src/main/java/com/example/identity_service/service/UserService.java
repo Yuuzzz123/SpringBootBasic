@@ -8,6 +8,7 @@ import com.example.identity_service.enums.Role;
 import com.example.identity_service.exception.AppException;
 import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.mapper.UserMapper;
+import com.example.identity_service.repository.RoleRepository;
 import com.example.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ import java.util.List;
 public class UserService {
 
     UserRepository userRepository;
+
+    RoleRepository roleRepository;
 
     UserMapper userMapper;
 
@@ -55,6 +58,7 @@ public class UserService {
 
     // Xét role trước khi gọi hàm
     @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasAuthority('APPROVE_POST')")
     public List<UserResponse> getUsers() {
         log.info("Get all users");
         return userMapper.toUserResponses(userRepository.findAll());
@@ -62,7 +66,7 @@ public class UserService {
 
 
     // Xét dieu kien sau khi hàm thực thi, trước khi trả về kết quả
-//    @PostAuthorize("returnObject.username == authentication.name")
+    // @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUser(String id) {
         log.info("Get user with id ");
         return userMapper.toUserResponse(userRepository.findById(id)
@@ -73,6 +77,12 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         userMapper.updateUser(user, request);
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        var roles = roleRepository.findAllById(request.getRoles());
+
+        user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
