@@ -77,9 +77,40 @@ public class UserControllerTest {
                         .content(content))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("code")
-                        .value(1000)
-
+                        .value(1000))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.id")
+                        .value("6c8910dd72a9"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.username")
+                        .value("user"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.firstName")
+                        .value("John"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.lastName")
+                        .value("Doe"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.dob")
+                        .value(dob.toString())
                 );
+    }
+
+    @Test
+        // Create User - Success
+    void createUser_usernameInvalid_fail() throws Exception {
+        // GIVEN
+        request.setUsername("use");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(request);
+
+        // WHEN, THEN
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("code")
+                        .value(1003))
+                .andExpect(MockMvcResultMatchers.jsonPath("message")
+                        .value("Username must be at least 4 characters long")
+                );
+
     }
 
 }
