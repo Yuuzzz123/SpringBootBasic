@@ -27,8 +27,10 @@ public class UserController {
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
 
+        log.info("Controller: Create User");
+
         return ApiResponse.<UserResponse>builder()
-                .result(userService.createRequest(request))
+                .result(userService.createUser(request))
                 .build();
     }
 
@@ -72,7 +74,7 @@ public class UserController {
 
     @GetMapping("/myinfo")
     ApiResponse<UserResponse> getMyInfo() {
-        
+
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getMyInfo())
                 .build();
