@@ -1,8 +1,7 @@
 package com.example.identity_service.controller;
 
-import com.example.identity_service.dto.request.UserCreationRequest;
-import com.example.identity_service.dto.response.UserResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +16,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mysql.MySQLContainer;
+
+import com.example.identity_service.dto.request.UserCreationRequest;
+import com.example.identity_service.dto.response.UserResponse;
+
+import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.ObjectMapper;
-
-import java.time.LocalDate;
-
 
 @Slf4j
 @SpringBootTest
@@ -38,7 +39,6 @@ public class UserControllerIntegrationTest {
         registry.add("spring.datasource.password", MY_SQL_CONTAINER::getPassword);
         registry.add("spring.datasource.driverClassName", () -> "com.mysql.cj.jdbc.Driver");
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
-
     }
 
     @Autowired
@@ -69,37 +69,28 @@ public class UserControllerIntegrationTest {
                 .lastName("Doe")
                 .dob(dob)
                 .build();
-
     }
 
     @Test
-        // Create User - Success
+    // Create User - Success
     void createUser_validRequest_success() throws Exception {
         // GIVEN
         ObjectMapper objectMapper = new ObjectMapper();
         String content = objectMapper.writeValueAsString(request);
 
         // WHEN, THEN
-        var response = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
+        var response = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(content))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("code")
-                        .value(1000))
-//                .andExpect(MockMvcResultMatchers.jsonPath("result.id")
-//                        .value("6c8910dd72a9"))
-                .andExpect(MockMvcResultMatchers.jsonPath("result.username")
-                        .value("user"))
-                .andExpect(MockMvcResultMatchers.jsonPath("result.firstName")
-                        .value("John"))
-                .andExpect(MockMvcResultMatchers.jsonPath("result.lastName")
-                        .value("Doe"))
-                .andExpect(MockMvcResultMatchers.jsonPath("result.dob")
-                        .value(dob.toString())
-                );
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000))
+                //                .andExpect(MockMvcResultMatchers.jsonPath("result.id")
+                //                        .value("6c8910dd72a9"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.username").value("user"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.firstName").value("John"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.lastName").value("Doe"))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.dob").value(dob.toString()));
 
         log.info("Result: {}", response.andReturn().getResponse().getContentAsString());
     }
-
 }

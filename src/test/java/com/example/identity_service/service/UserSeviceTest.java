@@ -1,11 +1,13 @@
 package com.example.identity_service.service;
 
-import com.example.identity_service.dto.request.UserCreationRequest;
-import com.example.identity_service.dto.response.UserResponse;
-import com.example.identity_service.entity.User;
-import com.example.identity_service.exception.AppException;
-import com.example.identity_service.repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +17,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.time.LocalDate;
-import java.util.Optional;
+import com.example.identity_service.dto.request.UserCreationRequest;
+import com.example.identity_service.dto.response.UserResponse;
+import com.example.identity_service.entity.User;
+import com.example.identity_service.exception.AppException;
+import com.example.identity_service.repository.UserRepository;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
 @Slf4j
@@ -73,14 +75,14 @@ public class UserSeviceTest {
 
     @Test
     void createUser_validRequest_success() {
-        //GIVEN
+        // GIVEN
         when(userRepository.existsByUsername(anyString())).thenReturn(Boolean.FALSE);
         when(userRepository.save(any())).thenReturn(user);
 
-        //WHEN
+        // WHEN
         var response = userService.createUser(request);
 
-        //THEN
+        // THEN
         Assertions.assertThat(response.getId()).isEqualTo("6c8910dd72a9");
         Assertions.assertThat(response.getUsername()).isEqualTo("user");
         Assertions.assertThat(response.getFirstName()).isEqualTo("John");
@@ -90,16 +92,14 @@ public class UserSeviceTest {
 
     @Test
     void createUser_userExisted_fail() {
-        //GIVEN
+        // GIVEN
         when(userRepository.existsByUsername(anyString())).thenReturn(Boolean.TRUE);
 
-        //WHEN
-        var exception = assertThrows(AppException.class, () ->
-                userService.createUser(request));
+        // WHEN
+        var exception = assertThrows(AppException.class, () -> userService.createUser(request));
 
-        //THEN
-        Assertions.assertThat(exception.getErrorCode().getCode())
-                .isEqualTo(1002);
+        // THEN
+        Assertions.assertThat(exception.getErrorCode().getCode()).isEqualTo(1002);
     }
 
     @Test
@@ -121,10 +121,9 @@ public class UserSeviceTest {
     void getMyInfo_userNotFound_fail() {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.ofNullable(null));
 
-        //WHEN
+        // WHEN
         var exception = assertThrows(AppException.class, () -> userService.getMyInfo());
 
         Assertions.assertThat(exception.getErrorCode().getCode()).isEqualTo(1006);
-
     }
 }

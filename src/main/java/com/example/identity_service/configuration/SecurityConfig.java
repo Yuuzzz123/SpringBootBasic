@@ -23,36 +23,35 @@ public class SecurityConfig {
     private CustomJwtDecoder customJwtDecoder;
 
     private final String[] PUBLIC_ENDPOINTS = {
-            "/auth/login",
-            "/auth/introspect",
-            "/auth/logout",
-            "/auth/refresh",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/swagger-resources/**",
-            "/webjars/**"
+        "/auth/login",
+        "/auth/introspect",
+        "/auth/logout",
+        "/auth/refresh",
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+        "/swagger-resources/**",
+        "/webjars/**"
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/users")
-//                        .hasRole(Role.ADMIN.name())
-//                        .hasAuthority("SCOPE_ADMIN")
-                        .anyRequest().authenticated());
+        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(PUBLIC_ENDPOINTS)
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/users")
+                .permitAll()
+                //                        .requestMatchers(HttpMethod.GET, "/users")
+                //                        .hasRole(Role.ADMIN.name())
+                //                        .hasAuthority("SCOPE_ADMIN")
+                .anyRequest()
+                .authenticated());
 
-        httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer ->
-                                jwtConfigurer.decoder(customJwtDecoder)
-                                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-        );
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(customJwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
-
 
         return httpSecurity.build();
     }

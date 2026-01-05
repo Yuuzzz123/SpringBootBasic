@@ -1,19 +1,21 @@
 package com.example.identity_service.configuration;
 
-import com.example.identity_service.entity.User;
-import com.example.identity_service.enums.Role;
-import com.example.identity_service.repository.UserRepository;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashSet;
+
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.HashSet;
+import com.example.identity_service.entity.User;
+import com.example.identity_service.enums.Role;
+import com.example.identity_service.repository.UserRepository;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,7 +26,8 @@ public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring",
+    @ConditionalOnProperty(
+            prefix = "spring",
             value = "datasource.driverClassName",
             havingValue = "com.mysql.cj.jdbc.Driver")
     ApplicationRunner applicationRunner(UserRepository userRepository) {
@@ -35,11 +38,12 @@ public class ApplicationInitConfig {
                 User user = User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
-//                        .roles(roles)
+                        //                        .roles(roles)
                         .build();
 
                 userRepository.save(user);
-                log.warn("Default admin user created with username 'admin' and password 'admin'. Please change the password after first login.");
+                log.warn(
+                        "Default admin user created with username 'admin' and password 'admin'. Please change the password after first login.");
             }
         };
     }

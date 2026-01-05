@@ -1,5 +1,13 @@
 package com.example.identity_service.service;
 
+import java.util.HashSet;
+import java.util.List;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.dto.response.UserResponse;
@@ -10,17 +18,11 @@ import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.mapper.UserMapper;
 import com.example.identity_service.repository.RoleRepository;
 import com.example.identity_service.repository.UserRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,26 +55,25 @@ public class UserService {
         HashSet<String> roles = new HashSet<>();
         roles.add(Role.USER.name());
 
-//        user.setRoles(roles);
+        //        user.setRoles(roles);
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
     // Xét role trước khi gọi hàm
     @PreAuthorize("hasRole('ADMIN')")
-//    @PreAuthorize("hasAuthority('APPROVE_POST')")
+    //    @PreAuthorize("hasAuthority('APPROVE_POST')")
     public List<UserResponse> getUsers() {
         log.info("Get all users");
         return userMapper.toUserResponses(userRepository.findAll());
     }
 
-
     // Xét dieu kien sau khi hàm thực thi, trước khi trả về kết quả
     // @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUser(String id) {
         log.info("Get user with id ");
-        return userMapper.toUserResponse(userRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
+        return userMapper.toUserResponse(
+                userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
     }
 
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
@@ -97,8 +98,7 @@ public class UserService {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
-        User user = userRepository.findByUsername(name)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         return userMapper.toUserResponse(user);
     }
