@@ -167,12 +167,10 @@ public class AuthenticationService {
                 }
             });
         }
-        // Hello ROLE_ADMIN APPROVE_POST DELETE_POST
-
         return stringJoiner.toString();
     }
 
-    // Refresh token
+    
     public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
         var signedJWT = verifyToken(request.getToken(), true);
 
