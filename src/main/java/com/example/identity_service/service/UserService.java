@@ -1,10 +1,11 @@
 package com.example.identity_service.service;
 
+import com.example.identity_service.constant.PredefinedRole;
 import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.dto.response.UserResponse;
+import com.example.identity_service.entity.Role;
 import com.example.identity_service.entity.User;
-import com.example.identity_service.enums.Role;
 import com.example.identity_service.exception.AppException;
 import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.mapper.UserMapper;
@@ -14,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,9 +42,9 @@ public class UserService {
 
         log.info("Service: Create User");
 
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new AppException(ErrorCode.USER_EXISTED);
-        }
+//        if (userRepository.existsByUsername(request.getUsername())) {
+//            throw new AppException(ErrorCode.USER_EXISTED);
+//        }
 
         User user = userMapper.toUser(request);
 
@@ -50,29 +52,34 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         // Assign default role
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
+        HashSet<Role> roles = new HashSet<>();
+        roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
-//        user.setRoles(roles);
+        user.setRoles(roles);
 
-        return userMapper.toUserResponse(userRepository.save(user));
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+
+        return userMapper.toUserResponse(user);
     }
 
     // Xét role trước khi gọi hàm
     @PreAuthorize("hasRole('ADMIN')")
-//    @PreAuthorize("hasAuthority('APPROVE_POST')")
+    //    @PreAuthorize("hasAuthority('APPROVE_POST')")
     public List<UserResponse> getUsers() {
         log.info("Get all users");
         return userMapper.toUserResponses(userRepository.findAll());
     }
 
-
     // Xét dieu kien sau khi hàm thực thi, trước khi trả về kết quả
     // @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUser(String id) {
         log.info("Get user with id ");
-        return userMapper.toUserResponse(userRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
+        return userMapper.toUserResponse(
+                userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
     }
 
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
@@ -97,8 +104,7 @@ public class UserService {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
-        User user = userRepository.findByUsername(name)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         return userMapper.toUserResponse(user);
     }

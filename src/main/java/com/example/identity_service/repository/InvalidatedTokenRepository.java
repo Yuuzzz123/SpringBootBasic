@@ -1,7 +1,8 @@
 package com.example.identity_service.repository;
 
-import com.example.identity_service.entity.InvalidatedToken;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.identity_service.entity.InvalidatedToken;
 
 public interface InvalidatedTokenRepository extends JpaRepository<InvalidatedToken, String> {
     boolean existsById(String token);
